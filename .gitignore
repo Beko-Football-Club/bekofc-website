@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Astro
+site/dist/
+site/.astro/
+
+# Terraform
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/crash.log
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Secrets
+*.pem
+*.key
+.env
+.env.local
