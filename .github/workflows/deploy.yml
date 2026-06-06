@@ -33,7 +33,10 @@ jobs:
 
       - name: Build
         working-directory: site
-        run: npm run build
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          npm run build
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
