@@ -3,9 +3,11 @@ backend:
   repo: Beko-Football-Club/bekofc-website
   branch: main
   base_url: https://api.netlify.com
-  # NOTE: We use Netlify's free OAuth proxy for the GitHub auth dance. We are NOT hosted
-  # on Netlify — the proxy just exchanges the OAuth code for a token. Plan 2 will swap this
-  # to a self-hosted proxy on AWS Lambda if we want to remove the Netlify dependency.
+  # site_domain points the OAuth handshake at the Netlify-recognized site. We are NOT hosted
+  # on Netlify — the proxy just exchanges the OAuth code for a token. The Netlify free site
+  # exists solely so the proxy can authorize this `site_id`. Plan 2 may swap this to a
+  # self-hosted Lambda proxy to remove the Netlify dependency entirely.
+  site_domain: resilient-dieffenbachia-94ba00.netlify.app
 
 media_folder: "site/public/uploads"
 public_folder: "/uploads"
