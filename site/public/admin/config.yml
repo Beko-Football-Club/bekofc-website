@@ -2,12 +2,10 @@ backend:
   name: github
   repo: Beko-Football-Club/bekofc-website
   branch: main
-  base_url: https://api.netlify.com
-  # site_domain points the OAuth handshake at the Netlify-recognized site. We are NOT hosted
-  # on Netlify — the proxy just exchanges the OAuth code for a token. The Netlify free site
-  # exists solely so the proxy can authorize this `site_id`. Plan 2 may swap this to a
-  # self-hosted Lambda proxy to remove the Netlify dependency entirely.
-  site_domain: cddf1886-2d91-4fc7-b447-787d171c7203
+  # Sveltia CMS uses GitHub's PKCE OAuth flow directly — no Netlify proxy required.
+  # The OAuth callback URL on the GitHub OAuth App must be set to:
+  #   https://bekofc.com/admin/
+  # Sveltia is a Decap-compatible fork (same config schema, same Git-backed model).
 
 media_folder: "site/public/uploads"
 public_folder: "/uploads"
