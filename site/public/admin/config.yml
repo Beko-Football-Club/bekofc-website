@@ -7,7 +7,7 @@ backend:
   # on Netlify — the proxy just exchanges the OAuth code for a token. The Netlify free site
   # exists solely so the proxy can authorize this `site_id`. Plan 2 may swap this to a
   # self-hosted Lambda proxy to remove the Netlify dependency entirely.
-  site_domain: resilient-dieffenbachia-94ba00.netlify.app
+  site_domain: cddf1886-2d91-4fc7-b447-787d171c7203
 
 media_folder: "site/public/uploads"
 public_folder: "/uploads"
