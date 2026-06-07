@@ -2,10 +2,11 @@ backend:
   name: github
   repo: Beko-Football-Club/bekofc-website
   branch: main
-  # Sveltia CMS uses GitHub's PKCE OAuth flow directly — no Netlify proxy required.
-  # The OAuth callback URL on the GitHub OAuth App must be set to:
-  #   https://bekofc.com/admin/
-  # Sveltia is a Decap-compatible fork (same config schema, same Git-backed model).
+  auth_type: pkce
+  app_id: Ov23liJ2isfPAZdob98t
+  # Sveltia uses GitHub's PKCE OAuth flow directly — no Netlify proxy required.
+  # app_id is the BEKO FC CMS GitHub OAuth App Client ID (public, not a secret).
+  # The OAuth App's Authorization callback URL must be: https://bekofc.com/admin/
 
 media_folder: "site/public/uploads"
 public_folder: "/uploads"
