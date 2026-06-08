@@ -1,10 +1,10 @@
 import { defineCollection, z } from 'astro:content';
-import { glob, file } from 'astro/loaders';
+import { glob } from 'astro/loaders';
 
-const CONTENT_ROOT = '../../../content';
+const CONTENT_ROOT = '../content';
 
 const settings = defineCollection({
-  loader: file(`${CONTENT_ROOT}/settings.yml`),
+  loader: glob({ base: CONTENT_ROOT, pattern: 'settings.yml' }),
   schema: z.object({
     team_name: z.object({ fr: z.string(), en: z.string() }),
     tagline: z.object({ fr: z.string(), en: z.string() }),
@@ -23,7 +23,7 @@ const settings = defineCollection({
 });
 
 const sponsorTiers = defineCollection({
-  loader: file(`${CONTENT_ROOT}/sponsor-tiers.yml`),
+  loader: glob({ base: CONTENT_ROOT, pattern: 'sponsor-tiers.yml' }),
   schema: z.object({
     tiers: z.array(
       z.object({
@@ -41,7 +41,7 @@ const sponsorTiers = defineCollection({
 });
 
 const translations = defineCollection({
-  loader: file(`${CONTENT_ROOT}/translations.yml`),
+  loader: glob({ base: CONTENT_ROOT, pattern: 'translations.yml' }),
   schema: z.object({
     translations: z.object({
       fr: z.record(z.record(z.string())),
