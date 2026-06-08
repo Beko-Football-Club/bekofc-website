@@ -27,3 +27,6 @@ Thumbs.db
 # Playwright + verification artifacts
 .playwright-mcp/
 admin-pkce-error.png
+
+# Local-only video staging (videos go to S3 media bucket)
+site/local-media/
