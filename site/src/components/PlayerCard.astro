@@ -1,0 +1,56 @@
+---
+import type { Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  name: string;
+  position: 'GK' | 'DF' | 'MF' | 'FW';
+  jersey_number: number;
+  photo?: string;
+  bio?: string;
+  matches_played?: number;
+  goals?: number;
+  assists?: number;
+}
+
+const { lang, name, position, jersey_number, photo, bio, matches_played = 0, goals = 0, assists = 0 } = Astro.props;
+const positionLabel: Record<string, { fr: string; en: string }> = {
+  GK: { fr: 'GAR', en: 'GK' },
+  DF: { fr: 'DEF', en: 'DF' },
+  MF: { fr: 'MIL', en: 'MF' },
+  FW: { fr: 'ATT', en: 'FW' },
+};
+const posLabel = positionLabel[position][lang];
+---
+
+<article class="player-card">
+  <div class="player-card__media">
+    {photo ? <img src={photo} alt={name} loading="lazy" /> : <div class="player-card__silhouette">{name.split(' ').map(p => p[0]).join('').slice(0, 2)}</div>}
+    <span class="player-card__jersey">#{jersey_number}</span>
+  </div>
+  <div class="player-card__body">
+    <h3>{name}</h3>
+    <p class="player-card__position">{posLabel}</p>
+    {bio && <p class="player-card__bio">{bio}</p>}
+    <ul class="player-card__stats">
+      <li><strong>{matches_played}</strong> {lang === 'fr' ? 'mat.' : 'GP'}</li>
+      <li><strong>{goals}</strong> {lang === 'fr' ? 'buts' : 'G'}</li>
+      <li><strong>{assists}</strong> {lang === 'fr' ? 'p.d.' : 'A'}</li>
+    </ul>
+  </div>
+</article>
+
+<style>
+  .player-card { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-paper); }
+  .player-card__media { position: relative; aspect-ratio: 1; background: var(--color-soft); }
+  .player-card__media img { width: 100%; height: 100%; object-fit: cover; }
+  .player-card__silhouette { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 3rem; color: var(--color-muted); }
+  .player-card__jersey { position: absolute; top: var(--space-2); right: var(--space-2); background: var(--color-primary); color: var(--color-on-primary); font-family: var(--font-display); padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); font-size: 1.25rem; }
+  .player-card__body { padding: var(--space-3); }
+  .player-card__body h3 { font-size: 1.25rem; margin: 0; }
+  .player-card__position { color: var(--color-muted); font-size: 0.85rem; margin: 0 0 var(--space-2); }
+  .player-card__bio { font-size: 0.9rem; color: var(--color-muted); margin-bottom: var(--space-3); }
+  .player-card__stats { list-style: none; margin: 0; padding: var(--space-2) 0 0; display: flex; gap: var(--space-3); border-top: 1px solid var(--color-border); }
+  .player-card__stats li { font-size: 0.85rem; color: var(--color-muted); }
+  .player-card__stats strong { color: var(--color-ink); font-family: var(--font-display); font-size: 1.1rem; margin-right: var(--space-1); }
+</style>
