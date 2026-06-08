@@ -1,0 +1,76 @@
+---
+import type { Lang } from '../i18n/routes';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const closeLabel = lang === 'fr' ? 'Fermer' : 'Close';
+---
+
+<dialog class="lightbox" aria-label={closeLabel}>
+  <button class="lightbox__close" aria-label={closeLabel}>×</button>
+  <div class="lightbox__content"></div>
+</dialog>
+
+<style>
+  .lightbox {
+    border: none; padding: 0; background: rgba(10, 10, 10, 0.92);
+    width: 90vw; max-width: 1200px; max-height: 90vh;
+    border-radius: var(--radius-md);
+  }
+  .lightbox::backdrop { background: rgba(10, 10, 10, 0.85); }
+  .lightbox__close {
+    position: absolute; top: 1rem; right: 1rem; z-index: 10;
+    background: var(--color-primary); color: var(--color-on-primary);
+    border: none; border-radius: 50%; width: 40px; height: 40px;
+    font-size: 1.5rem; line-height: 1; padding: 0;
+  }
+  .lightbox__content { display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .lightbox__content img, .lightbox__content video { max-width: 100%; max-height: 80vh; }
+</style>
+
+<script>
+  const lightbox = document.querySelector('.lightbox') as HTMLDialogElement | null;
+  const content = lightbox?.querySelector('.lightbox__content') as HTMLElement | null;
+  const closeBtn = lightbox?.querySelector('.lightbox__close') as HTMLButtonElement | null;
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const tile = target.closest('[data-lightbox]') as HTMLAnchorElement | null;
+    if (!tile || !lightbox || !content) return;
+    e.preventDefault();
+    const type = tile.dataset.lightbox;
+    const src = tile.getAttribute('href') ?? '';
+    const caption = tile.dataset.caption ?? '';
+
+    content.innerHTML = '';
+    if (type === 'video') {
+      const v = document.createElement('video');
+      v.src = src;
+      v.controls = true;
+      v.autoplay = true;
+      v.preload = 'metadata';
+      content.appendChild(v);
+    } else {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = caption;
+      content.appendChild(img);
+    }
+    lightbox.showModal();
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    if (lightbox?.open) lightbox.close();
+    if (content) content.innerHTML = '';
+  });
+
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      lightbox.close();
+      if (content) content.innerHTML = '';
+    }
+  });
+
+  lightbox?.addEventListener('close', () => {
+    if (content) content.innerHTML = '';
+  });
+</script>
