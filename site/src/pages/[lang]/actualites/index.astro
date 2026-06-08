@@ -1,0 +1,42 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import NewsCard from '../../../components/NewsCard.astro';
+import EmptyState from '../../../components/EmptyState.astro';
+import { getCollection } from 'astro:content';
+import { getTranslations } from '../../../i18n/t';
+
+export function getStaticPaths() { return [{ params: { lang: 'fr' } }]; }
+
+const lang = 'fr' as const;
+const t = await getTranslations(lang);
+const posts = (await getCollection('news', (e) => e.data.lang === 'fr' && e.data.status === 'published'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<SiteLayout title={t.nav.news} lang={lang}>
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <header class="page-hero">
+      <h1>{t.nav.news}</h1>
+    </header>
+    {posts.length === 0 ? (
+      <EmptyState message={t.empty.no_news} />
+    ) : (
+      <div class="news-grid">
+        {posts.map((p) => (
+          <NewsCard
+            lang={lang}
+            slug={p.data.slug}
+            title={p.data.title}
+            date={p.data.date}
+            hero_image={p.data.hero_image}
+          />
+        ))}
+      </div>
+    )}
+  </main>
+</SiteLayout>
+
+<style>
+  .page-hero { padding: var(--space-8) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-8); }
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-6); }
+</style>

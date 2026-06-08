@@ -1,0 +1,34 @@
+---
+import { routeFor, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+  title: string;
+  date: Date;
+  hero_image?: string;
+  excerpt?: string;
+}
+
+const { lang, slug, title, date, hero_image, excerpt } = Astro.props;
+const href = `${routeFor('news', lang)}/${slug}/`;
+const dateStr = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+---
+
+<article class="news-card">
+  {hero_image && <a href={href} class="news-card__media"><img src={hero_image} alt="" loading="lazy" /></a>}
+  <div class="news-card__body">
+    <time datetime={date.toISOString()}>{dateStr}</time>
+    <h3><a href={href}>{title}</a></h3>
+    {excerpt && <p>{excerpt}</p>}
+  </div>
+</article>
+
+<style>
+  .news-card { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-paper); display: flex; flex-direction: column; }
+  .news-card__media img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+  .news-card__body { padding: var(--space-4); }
+  .news-card__body time { color: var(--color-muted); font-size: 0.9rem; }
+  .news-card__body h3 { margin: var(--space-2) 0; font-size: 1.5rem; }
+  .news-card__body h3 a { text-decoration: none; }
+</style>

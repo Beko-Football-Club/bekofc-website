@@ -1,0 +1,35 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('news', (e) => e.data.lang === 'fr' && e.data.status === 'published');
+  return posts.map((p) => ({ params: { lang: 'fr', slug: p.data.slug }, props: { post: p } }));
+}
+
+const lang = 'fr' as const;
+const { post } = Astro.props;
+const { Content } = await render(post);
+const dateStr = new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(post.data.date);
+---
+
+<SiteLayout title={post.data.title} lang={lang} description={post.data.title} ogImage={post.data.hero_image} ogType="article">
+  <article class="container news-detail" style="padding: var(--space-12) var(--space-4);">
+    <header class="news-detail__header">
+      <h1>{post.data.title}</h1>
+      <time datetime={post.data.date.toISOString()}>{dateStr}</time>
+      {post.data.author && <p class="news-detail__author">— {post.data.author}</p>}
+    </header>
+    {post.data.hero_image && <img class="news-detail__hero" src={post.data.hero_image} alt="" />}
+    <div class="prose news-detail__body"><Content /></div>
+  </article>
+</SiteLayout>
+
+<style>
+  .news-detail { max-width: 48rem; margin: 0 auto; }
+  .news-detail__header { padding: var(--space-6) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-6); }
+  .news-detail__header time { color: var(--color-muted); }
+  .news-detail__author { color: var(--color-muted); margin-top: var(--space-2); }
+  .news-detail__hero { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-md); margin-bottom: var(--space-8); }
+  .news-detail__body { font-size: 1.1rem; }
+</style>
