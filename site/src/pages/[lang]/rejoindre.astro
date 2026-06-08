@@ -1,0 +1,33 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getEntry } from 'astro:content';
+
+export function getStaticPaths() { return [{ params: { lang: 'fr' } }]; }
+
+const lang = 'fr' as const;
+const page = await getEntry('pages', 'join');
+if (!page) throw new Error('content/pages/join.md missing');
+const settings = await getEntry('settings', 'settings');
+const s = settings!.data;
+const d = page.data;
+---
+
+<SiteLayout title={d.title.fr} lang={lang}>
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <header class="page-hero">
+      <h1>{d.hero_headline?.fr ?? d.title.fr}</h1>
+      {d.hero_subhead && <p class="page-hero__sub">{d.hero_subhead.fr}</p>}
+    </header>
+    <article class="prose" set:html={(d.body_fr ?? '').replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>')} />
+    <div class="cta-row">
+      <a class="btn" href={`mailto:${s.contact_email}`}>{s.contact_email}</a>
+      {s.whatsapp && <a class="btn" href={`https://wa.me/${s.whatsapp.replace(/\D/g, '')}`}>WhatsApp</a>}
+    </div>
+  </main>
+</SiteLayout>
+
+<style>
+  .page-hero { padding: var(--space-8) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-8); }
+  .page-hero__sub { font-size: 1.2rem; color: var(--color-muted); }
+  .cta-row { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-8); }
+</style>
