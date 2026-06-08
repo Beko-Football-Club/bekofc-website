@@ -1,7 +1,11 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import MatchRow from '../../components/MatchRow.astro';
+import SponsorCard from '../../components/SponsorCard.astro';
+import { getEntry, getCollection } from 'astro:content';
 import { getTranslations } from '../../i18n/t';
-import type { Lang } from '../../i18n/routes';
+import { routeFor, type Lang } from '../../i18n/routes';
 
 export function getStaticPaths() {
   return [{ params: { lang: 'fr' } }, { params: { lang: 'en' } }];
@@ -9,11 +13,90 @@ export function getStaticPaths() {
 
 const lang = Astro.params.lang as Lang;
 const t = await getTranslations(lang);
+const page = await getEntry('pages', 'home');
+const d = page!.data;
+
+const allNews = await getCollection('news', (e) => e.data.lang === lang && e.data.status === 'published');
+const news = allNews.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 3);
+
+const matches = (await getCollection('matches')).map((m) => m.data);
+const nextMatch = matches.filter((m) => m.status === 'upcoming').sort((a, b) => a.date.getTime() - b.date.getTime())[0];
+
+const gallery = (await getCollection('gallery')).map((g) => g.data).sort((a, b) => a.display_order - b.display_order).slice(0, 6);
+
+const sponsors = (await getCollection('sponsors', (e) => e.data.active))
+  .sort((a, b) => a.data.display_order - b.data.display_order);
 ---
 
 <SiteLayout title={t.nav.home} lang={lang}>
-  <main class="container" style="padding-top: var(--space-12); padding-bottom: var(--space-12);">
-    <h1>BEKO FC</h1>
-    <p>{lang === 'fr' ? 'Site en construction.' : 'Site under construction.'}</p>
+  <section class="hero">
+    {d.hero_image && <img class="hero__bg" src={d.hero_image} alt="" />}
+    <div class="hero__overlay"></div>
+    <div class="container hero__inner">
+      <h1>{d.hero_headline?.[lang] ?? 'BEKO FC'}</h1>
+      {d.hero_subhead && <p class="hero__sub">{d.hero_subhead[lang]}</p>}
+      <div class="hero__cta">
+        <a class="btn" href={routeFor('donate', lang)}>{t.buttons.donate}</a>
+        <a class="btn btn--ghost" href={routeFor('sponsors', lang)}>{t.buttons.sponsor}</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <section>
+      <h2>{t.nav.news}</h2>
+      {news.length > 0 ? (
+        <div class="news-grid">
+          {news.map((p) => (
+            <NewsCard lang={lang} slug={p.data.slug} title={p.data.title} date={p.data.date} hero_image={p.data.hero_image} />
+          ))}
+        </div>
+      ) : <p>{t.empty.no_news}</p>}
+    </section>
+
+    {nextMatch && (
+      <section>
+        <h2>{lang === 'fr' ? 'Prochain match' : 'Next match'}</h2>
+        <MatchRow lang={lang} {...nextMatch} recap={undefined} />
+      </section>
+    )}
+
+    {gallery.length > 0 && (
+      <section>
+        <h2>{t.nav.gallery}</h2>
+        <div class="gallery-strip">
+          {gallery.map((g) => (
+            <a href={routeFor('gallery', lang)} class="gallery-strip__tile">
+              <img src={g.poster ?? g.src} alt={g.caption_fr ?? g.caption_en ?? ''} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {sponsors.length > 0 && (
+      <section>
+        <h2>{t.nav.sponsors}</h2>
+        <div class="sponsors-strip">
+          {sponsors.map((s) => <SponsorCard name={s.data.name} logo={s.data.logo} website={s.data.website} />)}
+        </div>
+      </section>
+    )}
   </main>
 </SiteLayout>
+
+<style>
+  .hero { position: relative; min-height: 70vh; display: flex; align-items: center; overflow: hidden; }
+  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+  .hero__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.4) 100%); z-index: 1; }
+  .hero__inner { position: relative; z-index: 2; color: var(--color-paper); padding: var(--space-16) var(--space-4); }
+  .hero__inner h1 { font-size: clamp(3rem, 8vw, 6rem); margin: 0 0 var(--space-4); }
+  .hero__sub { font-size: clamp(1.1rem, 2vw, 1.4rem); max-width: 36rem; }
+  .hero__cta { display: flex; gap: var(--space-3); margin-top: var(--space-6); flex-wrap: wrap; }
+  .btn--ghost { background: transparent; color: var(--color-paper); border-color: var(--color-paper); }
+  section h2 { margin-top: var(--space-12); border-left: 6px solid var(--color-primary); padding-left: var(--space-3); }
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-6); }
+  .gallery-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-3); }
+  .gallery-strip__tile img { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); }
+  .sponsors-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-4); }
+</style>
