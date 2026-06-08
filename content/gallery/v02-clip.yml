@@ -1,0 +1,8 @@
+type: video
+src: "/media/02-clip.mp4"
+poster: "/uploads/photos/02-team.jpeg"
+caption_fr: "Échauffement collectif"
+caption_en: "Team warm-up"
+album: training
+date: 2026-09-10
+display_order: 14

@@ -1,0 +1,8 @@
+type: video
+src: "/media/01-clip.mp4"
+poster: "/uploads/photos/01-team.jpeg"
+caption_fr: "Action de match — but de Naomi"
+caption_en: "Match action — Naomi's goal"
+album: matchday
+date: 2026-09-15
+display_order: 13
