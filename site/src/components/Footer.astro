@@ -1,0 +1,54 @@
+---
+import { getEntry } from 'astro:content';
+import { getTranslations } from '../i18n/t';
+import { routeFor, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = await getTranslations(lang);
+const settings = await getEntry('settings', 'settings');
+const s = settings!.data;
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <strong>BEKO FC</strong>
+      <p class="site-footer__sub">Beko Football de Douala — B.F.D.</p>
+    </div>
+
+    <div class="site-footer__contact">
+      <p><a href={`mailto:${s.contact_email}`}>{s.contact_email}</a></p>
+      {s.whatsapp && <p>WhatsApp: <a href={`https://wa.me/${s.whatsapp.replace(/\D/g, '')}`}>{s.whatsapp}</a></p>}
+      <ul class="site-footer__socials">
+        {s.facebook_url && <li><a href={s.facebook_url} rel="noopener">Facebook</a></li>}
+        {s.instagram_url && <li><a href={s.instagram_url} rel="noopener">Instagram</a></li>}
+      </ul>
+    </div>
+
+    <nav class="site-footer__nav" aria-label="Secondary">
+      <ul>
+        <li><a href={routeFor('contact', lang)}>{t.nav.contact}</a></li>
+        <li><a href={routeFor('sponsors', lang)}>{t.nav.sponsors}</a></li>
+        <li><a href={routeFor('donate', lang)}>{t.nav.donate}</a></li>
+        <li><a href={routeFor('privacy', lang)}>{lang === 'fr' ? 'Confidentialité' : 'Privacy'}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="site-footer__copy">
+    <p>© {new Date().getFullYear()} Beko Football de Douala</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: var(--space-16); background: var(--color-ink); color: var(--color-paper); }
+  .site-footer a { color: var(--color-paper); }
+  .site-footer a:hover { color: var(--color-on-primary); background: var(--color-primary); }
+  .site-footer__inner { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-8); padding: var(--space-12) var(--space-4); }
+  .site-footer__sub { color: var(--color-muted); margin-top: var(--space-2); }
+  .site-footer__socials { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: flex; gap: var(--space-3); }
+  .site-footer__nav ul { list-style: none; margin: 0; padding: 0; }
+  .site-footer__nav li { margin-bottom: var(--space-2); }
+  .site-footer__copy { border-top: 1px solid var(--color-muted); padding: var(--space-4); text-align: center; }
+  @media (max-width: 720px) { .site-footer__inner { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,31 @@
+---
+import { equivalentRoute, type Lang } from '../i18n/routes';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const otherLang: Lang = lang === 'fr' ? 'en' : 'fr';
+const otherUrl = equivalentRoute(Astro.url.pathname, otherLang);
+const label = otherLang === 'en' ? 'EN' : 'FR';
+---
+<a href={otherUrl} class="lang-switch" aria-label={`Switch to ${label}`}>
+  <span class="lang-switch__current">{lang.toUpperCase()}</span>
+  <span class="lang-switch__sep">|</span>
+  <span class="lang-switch__other">{label}</span>
+</a>
+
+<style>
+  .lang-switch {
+    display: inline-flex;
+    gap: var(--space-2);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+  .lang-switch:hover { background: var(--color-primary); color: var(--color-on-primary); }
+  .lang-switch__current { color: var(--color-ink); }
+  .lang-switch__sep { color: var(--color-muted); }
+  .lang-switch__other { color: var(--color-muted); }
+  .lang-switch:hover .lang-switch__other { color: var(--color-on-primary); }
+</style>

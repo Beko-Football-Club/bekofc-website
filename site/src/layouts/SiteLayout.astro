@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Lang } from '../i18n/routes';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang: Lang;
+  ogImage?: string;
+  canonicalPath?: string;
+  ogType?: 'website' | 'article';
+}
+
+const props = Astro.props;
+---
+
+<BaseLayout {...props}>
+  <slot name="head" slot="head" />
+  <Header lang={props.lang} />
+  <slot />
+  <Footer lang={props.lang} />
+</BaseLayout>
