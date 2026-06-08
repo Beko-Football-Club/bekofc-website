@@ -1,0 +1,33 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import GalleryTile from '../../components/GalleryTile.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getCollection } from 'astro:content';
+import { getTranslations } from '../../i18n/t';
+
+export function getStaticPaths() { return [{ params: { lang: 'en' } }]; }
+
+const lang = 'en' as const;
+const t = await getTranslations(lang);
+const items = (await getCollection('gallery')).map((g) => g.data).sort((a, b) => a.display_order - b.display_order);
+---
+
+<SiteLayout title={t.nav.gallery} lang={lang}>
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <header class="page-hero">
+      <h1>{t.nav.gallery}</h1>
+    </header>
+    {items.length === 0 ? <EmptyState message={t.empty.no_gallery} /> : (
+      <div class="gallery-grid">
+        {items.map((g) => (
+          <GalleryTile type={g.type} src={g.src} poster={g.poster} caption={g.caption_en} />
+        ))}
+      </div>
+    )}
+  </main>
+</SiteLayout>
+
+<style>
+  .page-hero { padding: var(--space-8) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-8); }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-3); }
+</style>
