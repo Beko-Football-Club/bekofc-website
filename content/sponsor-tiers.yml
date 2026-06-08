@@ -1,0 +1,52 @@
+tiers:
+  - slug: principal
+    name:
+      fr: "Partenaire Principal"
+      en: "Principal Partner"
+    price:
+      fr: "Sur devis"
+      en: "On request"
+    benefits:
+      fr:
+        - "Logo principal sur le maillot"
+        - "Présence sur toutes les communications officielles"
+        - "Mention prioritaire sur le site web et les réseaux sociaux"
+        - "Espace VIP aux matchs à domicile"
+      en:
+        - "Primary logo on team jersey"
+        - "Presence on all official communications"
+        - "Priority mention on website and social media"
+        - "VIP space at home matches"
+    prominence: 1
+  - slug: officiel
+    name:
+      fr: "Partenaire Officiel"
+      en: "Official Partner"
+    price:
+      fr: "Sur devis"
+      en: "On request"
+    benefits:
+      fr:
+        - "Logo sur les supports de communication"
+        - "Mention sur le site web et les réseaux sociaux"
+        - "Invitations aux matchs à domicile"
+      en:
+        - "Logo on communication materials"
+        - "Mention on website and social media"
+        - "Invitations to home matches"
+    prominence: 2
+  - slug: supporter
+    name:
+      fr: "Supporter"
+      en: "Supporter"
+    price:
+      fr: "Sur devis"
+      en: "On request"
+    benefits:
+      fr:
+        - "Mention sur le site web"
+        - "Reconnaissance dans les communications annuelles"
+      en:
+        - "Mention on website"
+        - "Recognition in annual communications"
+    prominence: 3
