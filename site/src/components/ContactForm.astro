@@ -1,0 +1,82 @@
+---
+import { getEntry } from 'astro:content';
+import { getTranslations } from '../i18n/t';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = await getTranslations(lang);
+const settings = await getEntry('settings', 'settings');
+const s = settings!.data;
+const accessKey = s.web3forms_access_key ?? '';
+const subjectPrefix = lang === 'fr' ? 'Contact via bekofc.com' : 'Contact via bekofc.com';
+const mailto = `mailto:${s.contact_email}?subject=${encodeURIComponent(subjectPrefix)}`;
+---
+
+<form class="contact-form" action="https://api.web3forms.com/submit" method="POST" data-mailto={mailto} data-lang={lang}>
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value={subjectPrefix} />
+  <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+
+  <label>
+    <span>{lang === 'fr' ? 'Nom' : 'Name'}</span>
+    <input type="text" name="name" required autocomplete="name" />
+  </label>
+  <label>
+    <span>Email</span>
+    <input type="email" name="email" required autocomplete="email" />
+  </label>
+  <label>
+    <span>{lang === 'fr' ? 'Message' : 'Message'}</span>
+    <textarea name="message" rows="6" required></textarea>
+  </label>
+
+  <div class="contact-form__actions">
+    <button type="submit" class="btn">{t.buttons.submit}</button>
+    <a class="contact-form__mailto" href={mailto}>{t.labels.prefer_email} {t.labels.fallback_email}</a>
+  </div>
+
+  <p class="contact-form__status" role="status" aria-live="polite" hidden></p>
+</form>
+
+<style>
+  .contact-form { display: grid; gap: var(--space-4); max-width: 36rem; }
+  .contact-form label { display: grid; gap: var(--space-2); }
+  .contact-form label span { font-weight: 600; }
+  .contact-form input, .contact-form textarea {
+    font-family: var(--font-body); font-size: 1rem; padding: var(--space-3);
+    border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-paper);
+  }
+  .contact-form__actions { display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; }
+  .contact-form__mailto { color: var(--color-muted); }
+  .contact-form__status { padding: var(--space-3); border-radius: var(--radius-sm); }
+  .contact-form__status[data-state="ok"] { background: var(--color-primary); color: var(--color-on-primary); }
+  .contact-form__status[data-state="error"] { background: #fdd; color: #800; }
+</style>
+
+<script>
+  const form = document.querySelector('.contact-form') as HTMLFormElement | null;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      const accessKey = (form.querySelector('input[name="access_key"]') as HTMLInputElement).value;
+      if (!accessKey) return;
+      e.preventDefault();
+      const lang = form.dataset.lang ?? 'fr';
+      const status = form.querySelector('.contact-form__status') as HTMLElement;
+      status.hidden = false;
+      status.removeAttribute('data-state');
+      status.textContent = lang === 'fr' ? 'Envoi…' : 'Sending…';
+      const data = new FormData(form);
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data });
+        if (!res.ok) throw new Error('http ' + res.status);
+        status.textContent = lang === 'fr' ? 'Merci, message reçu.' : 'Thanks, message received.';
+        status.dataset.state = 'ok';
+        form.reset();
+      } catch {
+        status.textContent = lang === 'fr' ? 'Erreur — utilisez le lien email ci-dessus.' : 'Error — please use the email link above.';
+        status.dataset.state = 'error';
+      }
+    });
+  }
+</script>
