@@ -1,0 +1,21 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getEntry } from 'astro:content';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'fr' } }];
+}
+
+const lang = 'fr' as const;
+const page = await getEntry('pages', 'privacy');
+if (!page) throw new Error('content/pages/privacy.md missing');
+const body = page.data.body_fr ?? '';
+const title = page.data.title.fr;
+---
+
+<SiteLayout title={title} lang={lang}>
+  <main class="container prose" style="padding: var(--space-12) var(--space-4);">
+    <h1>{title}</h1>
+    <article set:html={body.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>')} />
+  </main>
+</SiteLayout>
