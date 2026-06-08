@@ -1,0 +1,64 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import SponsorCard from '../../components/SponsorCard.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getEntry, getCollection } from 'astro:content';
+import { getTranslations } from '../../i18n/t';
+
+export function getStaticPaths() { return [{ params: { lang: 'en' } }]; }
+
+const lang = 'en' as const;
+const t = await getTranslations(lang);
+const page = await getEntry('pages', 'sponsors');
+const tiers = (await getEntry('sponsor-tiers', 'sponsor-tiers'))!.data.tiers;
+const sponsors = (await getCollection('sponsors', (e) => e.data.active))
+  .sort((a, b) => a.data.display_order - b.data.display_order);
+const settings = await getEntry('settings', 'settings');
+const inquiryEmail = settings!.data.sponsor_inquiry_email;
+const d = page!.data;
+---
+
+<SiteLayout title={d.title.en} lang={lang}>
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <header class="page-hero">
+      <h1>{d.hero_headline?.en ?? d.title.en}</h1>
+      {d.hero_subhead && <p class="page-hero__sub">{d.hero_subhead.en}</p>}
+    </header>
+
+    <article class="prose" set:html={(d.body_en ?? '').replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>')} />
+
+    <section class="tiers">
+      {tiers.sort((a, b) => a.prominence - b.prominence).map((tier) => (
+        <article class="tier">
+          <h3>{tier.name.en}</h3>
+          <p class="tier__price">{tier.price.en}</p>
+          <ul class="tier__benefits">
+            {tier.benefits.en.map((b) => <li>{b}</li>)}
+          </ul>
+          <a class="btn" href={`mailto:${inquiryEmail}?subject=${encodeURIComponent(tier.name.en)}`}>{t.labels.sponsor_inquiry}</a>
+        </article>
+      ))}
+    </section>
+
+    <section>
+      <h2>Current partners</h2>
+      {sponsors.length === 0 ? <EmptyState message={t.empty.no_sponsors} /> : (
+        <div class="sponsors-grid">
+          {sponsors.map((s) => <SponsorCard name={s.data.name} logo={s.data.logo} website={s.data.website} />)}
+        </div>
+      )}
+    </section>
+  </main>
+</SiteLayout>
+
+<style>
+  .page-hero { padding: var(--space-8) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-8); }
+  .page-hero__sub { font-size: 1.2rem; color: var(--color-muted); }
+  .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4); margin: var(--space-12) 0; }
+  .tier { padding: var(--space-6); border: 2px solid var(--color-ink); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: var(--space-3); background: var(--color-paper); }
+  .tier__price { font-family: var(--font-display); font-size: 1.5rem; }
+  .tier__benefits { padding-left: var(--space-6); margin: 0; }
+  .tier .btn { margin-top: auto; align-self: start; }
+  .sponsors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }
+  section h2 { margin-top: var(--space-12); }
+</style>
