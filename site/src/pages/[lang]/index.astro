@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { Lang } from '../../i18n/routes';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'fr' } }, { params: { lang: 'en' } }];
+}
+
+const lang = Astro.params.lang as Lang;
+const title = lang === 'fr' ? 'Accueil' : 'Home';
+---
+
+<BaseLayout title={title} lang={lang}>
+  <main style="font-family: 'Inter', system-ui, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; text-align: center;">
+    <h1 style="font-family: 'Anton', sans-serif;">BEKO FC</h1>
+    <p>{lang === 'fr' ? "Site en construction." : "Site under construction."}</p>
+    <p><a href={lang === 'fr' ? '/en/' : '/fr/'}>{lang === 'fr' ? 'English' : 'Français'}</a></p>
+  </main>
+</BaseLayout>
