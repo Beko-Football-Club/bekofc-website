@@ -1,0 +1,27 @@
+:root {
+  --color-primary: #FFD700;
+  --color-on-primary: #0A0A0A;
+  --color-ink: #0A0A0A;
+  --color-paper: #FFFFFF;
+  --color-muted: #6B6B6B;
+  --color-soft: #F5F5F5;
+  --color-border: #E5E5E5;
+
+  --font-display: 'Anton', 'Impact', 'Helvetica Neue', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+
+  --max-content: 72rem;
+  --max-prose: 40rem;
+}
