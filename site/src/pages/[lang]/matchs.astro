@@ -1,0 +1,49 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import StandingsTable from '../../components/StandingsTable.astro';
+import MatchRow from '../../components/MatchRow.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getCollection } from 'astro:content';
+import { getTranslations } from '../../i18n/t';
+
+export function getStaticPaths() { return [{ params: { lang: 'fr' } }]; }
+
+const lang = 'fr' as const;
+const t = await getTranslations(lang);
+const matches = (await getCollection('matches')).map((m) => m.data);
+const upcoming = matches.filter((m) => m.status === 'upcoming').sort((a, b) => a.date.getTime() - b.date.getTime());
+const completed = matches.filter((m) => m.status === 'completed').sort((a, b) => b.date.getTime() - a.date.getTime());
+const standings = await getCollection('standings');
+---
+
+<SiteLayout title={t.nav.matches} lang={lang}>
+  <main class="container" style="padding: var(--space-12) var(--space-4);">
+    <header class="page-hero">
+      <h1>{t.nav.matches}</h1>
+    </header>
+
+    <section>
+      <h2>Classement</h2>
+      {standings.length === 0 ? <EmptyState message={t.empty.no_standings} /> : <StandingsTable lang={lang} />}
+    </section>
+
+    <section>
+      <h2>Matchs à venir</h2>
+      {upcoming.length === 0 ? <EmptyState message={t.empty.no_matches} /> : (
+        upcoming.map((m) => <MatchRow lang={lang} {...m} recap={undefined} />)
+      )}
+    </section>
+
+    <section>
+      <h2>Résultats récents</h2>
+      {completed.length === 0 ? <EmptyState message={t.empty.no_matches} /> : (
+        completed.map((m) => <MatchRow lang={lang} {...m} recap={m.recap_fr} />)
+      )}
+    </section>
+  </main>
+</SiteLayout>
+
+<style>
+  .page-hero { padding: var(--space-8) 0; border-bottom: 4px solid var(--color-primary); margin-bottom: var(--space-8); }
+  section h2 { margin-top: var(--space-12); }
+</style>

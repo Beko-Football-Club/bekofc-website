@@ -1,0 +1,51 @@
+---
+import type { Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  date: Date;
+  kickoff?: string;
+  opponent: string;
+  home_or_away: 'home' | 'away';
+  location: string;
+  status: 'upcoming' | 'completed';
+  beko_score?: number;
+  opponent_score?: number;
+  recap?: string;
+}
+
+const { lang, date, kickoff, opponent, home_or_away, location, status, beko_score, opponent_score, recap } = Astro.props;
+const dateStr = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' }).format(date);
+const venue = home_or_away === 'home' ? (lang === 'fr' ? 'Domicile' : 'Home') : (lang === 'fr' ? 'Extérieur' : 'Away');
+const left = home_or_away === 'home' ? 'BEKO FC' : opponent;
+const right = home_or_away === 'home' ? opponent : 'BEKO FC';
+const leftScore = home_or_away === 'home' ? beko_score : opponent_score;
+const rightScore = home_or_away === 'home' ? opponent_score : beko_score;
+---
+
+<article class="match-row">
+  <div class="match-row__meta">
+    <time datetime={date.toISOString()}>{dateStr}</time>
+    {kickoff && <span class="match-row__kickoff">{kickoff}</span>}
+    <span class="match-row__venue">{venue} — {location}</span>
+  </div>
+  <div class="match-row__teams">
+    <span class="match-row__team">{left}</span>
+    {status === 'completed' ? (
+      <span class="match-row__score">{leftScore} – {rightScore}</span>
+    ) : (
+      <span class="match-row__vs">vs</span>
+    )}
+    <span class="match-row__team">{right}</span>
+  </div>
+  {recap && <p class="match-row__recap">{recap}</p>}
+</article>
+
+<style>
+  .match-row { padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: var(--space-3); background: var(--color-paper); }
+  .match-row__meta { display: flex; gap: var(--space-3); flex-wrap: wrap; color: var(--color-muted); font-size: 0.9rem; margin-bottom: var(--space-3); }
+  .match-row__teams { display: flex; align-items: center; justify-content: center; gap: var(--space-4); font-family: var(--font-display); font-size: 1.5rem; }
+  .match-row__score { background: var(--color-primary); padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); }
+  .match-row__vs { color: var(--color-muted); font-size: 1rem; }
+  .match-row__recap { margin: var(--space-3) 0 0; color: var(--color-muted); }
+</style>
