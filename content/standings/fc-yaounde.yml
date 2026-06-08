@@ -1,0 +1,11 @@
+position: 5
+team: "FC Yaoundé"
+played: 2
+won: 0
+drawn: 1
+lost: 1
+goals_for: 1
+goals_against: 2
+goal_difference: -1
+points: 1
+is_beko: false
