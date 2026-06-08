@@ -1,10 +1,34 @@
 ---
+import { getEntry } from 'astro:content';
+import type { Lang } from '../i18n/routes';
+import { equivalentRoute } from '../i18n/routes';
+
 interface Props {
   title: string;
-  lang: 'fr' | 'en';
+  description?: string;
+  lang: Lang;
+  ogImage?: string;
+  canonicalPath?: string;
+  ogType?: 'website' | 'article';
 }
 
-const { title, lang } = Astro.props;
+const { title, description, lang, ogImage, canonicalPath, ogType = 'website' } = Astro.props;
+
+const settings = await getEntry('settings', 'settings');
+const translations = await getEntry('translations', 'translations');
+if (!settings) throw new Error('content/settings.yml is missing');
+if (!translations) throw new Error('content/translations.yml is missing');
+
+const t = translations.data.translations[lang];
+const finalDescription = description ?? t.meta.site_description;
+const finalOgImage = ogImage ?? settings.data.default_og_image;
+const fullTitle = `${title} — ${t.meta.site_name}`;
+
+const canonical = canonicalPath ?? Astro.url.pathname;
+const canonicalUrl = new URL(canonical, Astro.site).toString();
+const otherLang: Lang = lang === 'fr' ? 'en' : 'fr';
+const otherUrl = new URL(equivalentRoute(Astro.url.pathname, otherLang), Astro.site).toString();
+const ogImageUrl = new URL(finalOgImage, Astro.site).toString();
 ---
 
 <!doctype html>
@@ -13,7 +37,35 @@ const { title, lang } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
+    <meta name="description" content={finalDescription} />
+
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang={lang} href={canonicalUrl} />
+    <link rel="alternate" hreflang={otherLang} href={otherUrl} />
+    <link rel="alternate" hreflang="x-default" href={new URL(`/${lang}/`, Astro.site).toString()} />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={finalDescription} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_US'} />
+    <meta property="og:site_name" content={t.meta.site_name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={finalDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap"
+    />
+
+    <slot name="head" />
   </head>
   <body>
     <slot />
