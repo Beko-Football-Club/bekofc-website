@@ -23,3 +23,7 @@ Thumbs.db
 *.key
 .env
 .env.local
+
+# Playwright + verification artifacts
+.playwright-mcp/
+admin-pkce-error.png
